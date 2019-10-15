@@ -14,7 +14,8 @@ interface tweetMessage {
     user:string,
     user_network:string,
     tip_network: string,
-    xrp:number
+    xrp:number,
+    tweetId:string,
 }
 
 export class TwitterApi {
@@ -153,8 +154,8 @@ export class TwitterApi {
                     await this.storage.setItem('maxNumberOfRequestsRemaining',this.maxNumberOfRequestsRemaining);
 
                     //check for reply only when tip was initiated via twitter
-                    if('twitter' === newTweet.tip_network)
-                        tweetId = await this.checkForTweetMatch(newTweet.user, newTweet.xrp);
+                    if('twitter' === newTweet.tip_network && newTweet.tweetId)
+                        tweetId = newTweet.tweetId;
 
                     //like the tweet if we found a match
                     if(tweetId)
@@ -244,9 +245,9 @@ export class TwitterApi {
         }
     }
 
-    async pushToQueue(message:string, greeting:string, user:string, user_network:string, tip_network: string, xrp:number) {
+    async pushToQueue(message:string, greeting:string, user:string, user_network:string, tip_network: string, xrp:number, tweetId?:string) {
         this.writeToConsole("pusing new tweet to queue:");
-        this.tweetQueue.push({message: message, greeting: greeting, user: user, user_network: user_network, tip_network: tip_network, xrp: xrp});
+        this.tweetQueue.push({message: message, greeting: greeting, user: user, user_network: user_network, tip_network: tip_network, xrp: xrp, tweetId: tweetId});
         try {
             await this.storage.setItem('tweetQueue', this.tweetQueue);
         } catch(err) {

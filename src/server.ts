@@ -265,14 +265,21 @@ async function sendOutTweet(newTip: any, dropsForEachCharity: number) {
         else
             greetingText = '\n'+twitterRealAPI.getRandomGreetingsText()+'\n'+twitterRealAPI.getRandomHashtagText();
 
+        //trying to get tweetId where to like and reply to
+        let tweetId:string;
+        if(newTip.context && newTip.context.split('/').length > 0) {
+            let contextSplit = newTip.context.split('/');
+            tweetId = contextSplit[contextSplit.length-1];
+        }
+
         //push new tweet to queue for sending it out later to the defined api
         if(botAccounts.includes(newTip.user_id)) {
             writeToConsole("Pushing to BotAPI")
-            twitterBotAPI.pushToQueue(tweetString, greetingText, user, user_network, newTip.network, newTip.xrp);
+            twitterBotAPI.pushToQueue(tweetString, greetingText, user, user_network, newTip.network, newTip.xrp, tweetId);
         }
         else {
             writeToConsole("Pushing to RealAPI")
-            twitterRealAPI.pushToQueue(tweetString, greetingText, user, user_network, newTip.network, newTip.xrp);
+            twitterRealAPI.pushToQueue(tweetString, greetingText, user, user_network, newTip.network, newTip.xrp, tweetId);
         }
     } else {
         writeToConsole("No tweet generated for this user.")

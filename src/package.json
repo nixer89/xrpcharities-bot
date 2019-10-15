@@ -1,6 +1,6 @@
 {
   "name": "xrpcharities-bot",
-  "version": "3.2.3",
+  "version": "3.3.0",
   "description": "xprcharities-bot for splitting incoming tips among multiple charities",
   "main": "server.ts",
   "scripts": {
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GSG-KingBlue/xrpcharities-bot.git"
+    "url": "git+https://github.com/nixer89/xrpcharities-bot.git"
   },
   "author": "Good Souls Group",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/GSG-KingBlue/xrpcharities-bot/issues"
+    "url": "https://github.com/nixer89/xrpcharities-bot/issues"
   },
-  "homepage": "https://github.com/GSG-KingBlue/xrpcharities-bot#readme",
+  "homepage": "https://github.com/nixer89/xrpcharities-bot#readme",
   "dependencies": {
     "console-stamp": "^0.2.9",
     "https-proxy-agent": "^2.2.2",
