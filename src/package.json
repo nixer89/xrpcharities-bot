@@ -1,6 +1,6 @@
 {
   "name": "xrpcharities-bot",
-  "version": "3.3.1",
+  "version": "3.4.0",
   "description": "xprcharities-bot for splitting incoming tips among multiple charities",
   "main": "server.ts",
   "scripts": {
@@ -21,23 +21,23 @@
   "homepage": "https://github.com/nixer89/xrpcharities-bot#readme",
   "dependencies": {
     "console-stamp": "^0.2.9",
-    "https-proxy-agent": "^2.2.2",
+    "https-proxy-agent": "^2.2.4",
     "mqtt": "^2.18.8",
     "node-fetch": "^2.6.0",
     "node-persist": "^3.0.5",
     "shuffle-array": "^1.0.1",
     "twit": "^2.2.11",
-    "typescript": "^3.6.3"
+    "typescript": "^3.7.2"
   },
   "devDependencies": {
     "@types/console-stamp": "^0.2.32",
     "@types/mqtt": "^2.5.0",
-    "@types/node": "^11.13.20",
-    "@types/node-fetch": "^2.5.1",
+    "@types/node": "^11.15.2",
+    "@types/node-fetch": "^2.5.3",
     "@types/node-persist": "0.0.33",
     "@types/shuffle-array": "0.0.28",
-    "@types/twit": "^2.2.22",
+    "@types/twit": "^2.2.23",
     "concurrently": "^4.1.2",
-    "nodemon": "^1.19.2"
+    "nodemon": "^1.19.4"
   }
 }

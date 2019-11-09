@@ -253,10 +253,12 @@ async function sendOutTweet(newTip: any, dropsForEachCharity: number) {
                 tweetString = user + ' from '+ user_network+' donated ' + newTip.xrp + ' XRP to @'+config.MQTT_TOPIC_USER+'.\n\n';
         }
 
+        tweetString+= "Sending " + dropsForEachCharity/config.DROPS + " XRP to each of these charities:\n"
+
         //shuffle charities before putting into new tweet
         let shuffledCharities = shuffle(friendList, { 'copy': true });
         for(let i = 0; i<shuffledCharities.length;i++)
-            tweetString+= '@'+ shuffledCharities[i]+ ' +' + dropsForEachCharity/config.DROPS + ' XRP\n';
+            tweetString+= '@'+ shuffledCharities[i]+ '\n';
 
         //add some greetings text (keep randomness for each api)
         let greetingText = "";
