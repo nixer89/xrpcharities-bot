@@ -1,5 +1,6 @@
 import * as mqtt from 'mqtt';
 import * as shuffle from 'shuffle-array';
+import * as schedule from 'node-schedule';
 import * as tipbot from './api/tipbotApi';
 import * as twitter from './api/twitterApi';
 import * as config from './config/config';
@@ -17,7 +18,6 @@ let tipQueue:any[] = [];
 let processingTip = false;
 let processingRemaining = false;
 
-let processRemainingTimeout:NodeJS.Timeout;
 let splitTipsTimeout:NodeJS.Timeout;
 
 let twitterRealAPI:twitter.TwitterApi;
@@ -85,6 +85,9 @@ function initMQTT() {
 
         //call splitTips every 15 seconds to try to split received tips. if no tips, no action
         splitTipsTimeout = setInterval(() => splitTips(), 15000);
+
+        //check for remaining balance
+        schedule.scheduleJob("remainingBalance", {dayOfWeek: 1, hour: 6}, () => checkForRemainingBalance());
     });
 
     mqttClient.on('close', () => {
@@ -215,16 +218,6 @@ async function splitTips() {
 
         processingTip = false;
 
-        //check remaining balance (only if we don`t have any more tips to split) with a delay of some seconds!
-        if(tipQueue.length == 0) {
-            writeToConsole("no tips anymore, set timer for remaining balance!");
-            //cancel last timer if it exist (when a new tip came in before the old timer was executed)
-            if(processRemainingTimeout) clearTimeout(processRemainingTimeout);
-
-            //check 2 min after last received tip if remaining balance can be split
-            processRemainingTimeout = setTimeout(() => checkForRemainingBalance(),120000);
-        }
-
     } else {
         if(tipQueue.length > 0) {
             writeToConsole("Could not process tip. Still processing something else!");
@@ -289,18 +282,18 @@ async function sendOutTweet(newTip: any, dropsForEachCharity: number) {
 }
 
 async function checkForRemainingBalance() {
-    //check for remaining balance if we don`t have any tip and/or are processing no tip
+    //check for remaining balance if we don`t have any tip and/or aren't processing any tip
     if(tipQueue.length == 0 && !processingTip && !processingRemaining) {
-        writeToConsole("checking remaining balance");
+        writeToConsole("splitting remaining account balance");
         processingRemaining = true;
         try {
-            //check if there is some balance left and forward it when whole amount can get equaly split by all charities
+            //check if there is some balance left and forward it to the charities
             let remainingXRPToForward = await tipbot.getBalance();
             let remainingDropsToForward = remainingXRPToForward*config.DROPS;
-            if(remainingDropsToForward > 0 && remainingDropsToForward%friendList.length == 0) {
-                //ok perfect, the amount can be divided by the number of charities. we can send out another tip to all charities
+            if(remainingDropsToForward > friendList.length) {
+                //calculate drops for each charity and forward it
                 let remainingDropsEachCharity = calculateDropsForEachCharity(remainingDropsToForward);
-                writeToConsole("Account balance could be divided equally. Sending " + remainingDropsEachCharity/config.DROPS + " XRP to each charity.")
+                writeToConsole("Account balance divided. Sending " + remainingDropsEachCharity/config.DROPS + " XRP to each charity.")
                 if(tipQueue.length == 0 && !processingTip) {
                     for(let i = 0;i<friendList.length;i++) {
                         //send out tips sync with delay!
@@ -312,6 +305,8 @@ async function checkForRemainingBalance() {
                     writeToConsole("Remaining balance was split.")
                 } else {
                     writeToConsole("not splitting remaining balance because we have received a new tip");
+                    //check for it later again!
+                    setTimeout(() => checkForRemainingBalance(), 60000);
                 }
             } else {
                 if(remainingDropsToForward > 0)
@@ -325,6 +320,9 @@ async function checkForRemainingBalance() {
             writeToConsole(JSON.stringify(err));
             processingRemaining = false;
         }
+    } else if (tipQueue.length > 0 || processingTip) {
+        //seems like we are still processing tips. check for remaining balance in a minute again!
+        setTimeout(() => checkForRemainingBalance(), 60000);
     }
 }
 
